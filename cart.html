@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CraveCraft | My Cart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header>
+        <h1>🍓 CraveCraft</h1>
+
+        <nav>
+            <a href="home.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="builder.html">Builder</a>
+            <a href="cart.html">Cart</a>
+            <a href="orders.html">Orders</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+
+    <!-- Cart Heading -->
+    <section class="cart-hero">
+        <h2>🛒 Your Shopping Cart</h2>
+        <p>Your favourite food is just a few steps away!</p>
+    </section>
+
+    <!-- Cart Content -->
+    <main class="cart-container">
+
+        <section class="cart-items-section">
+            <h3>Items in Your Cart</h3>
+
+            <div id="cartItems">
+                <!-- Cart items will appear here -->
+            </div>
+
+            <button type="button" onclick="clearCart()" class="clear-cart-button">
+                Clear Cart
+            </button>
+        </section>
+
+        <!-- Order Summary -->
+        <section class="cart-summary">
+            <h3>Order Summary</h3>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span><span id="cartSubtotal">0</span></span>
+            </div>
+
+            <div class="summary-row">
+                <span>Delivery Fee</span>
+                <span><span id="deliveryFee">40</span></span>
+            </div>
+
+            <hr>
+
+            <div class="summary-row total-row">
+                <strong>Total</strong>
+                <strong><span id="cartTotal">40</span></strong>
+            </div>
+
+            <button type="button"
+                onclick="window.location.href='menu.html'"
+                class="continue-shopping-button">
+                Continue Shopping
+            </button>
+
+            <button type="button"
+                onclick="goToCheckout()"
+                class="checkout-button">
+                Proceed to Checkout →
+            </button>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 CraveCraft | Made with ❤️ for Food Lovers</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <script>
+        // Display the cart and update the summary
+        function displayCartPage() {
+            renderCart();
+
+            const cart = JSON.parse(
+                localStorage.getItem("craveCraftCart")
+            ) || [];
+
+            const subtotal = cart.reduce(function (sum, item) {
+                return sum + (Number(item.price) * Number(item.quantity));
+            }, 0);
+
+            const delivery = subtotal > 0 ? 40 : 0;
+            const total = subtotal + delivery;
+
+            document.getElementById("cartSubtotal").textContent = subtotal;
+            document.getElementById("deliveryFee").textContent = delivery;
+            document.getElementById("cartTotal").textContent = total;
+        }
+
+        // Continue to checkout only if the cart has items
+        function goToCheckout() {
+            const cart = JSON.parse(
+                localStorage.getItem("craveCraftCart")
+            ) || [];
+
+            if (cart.length === 0) {
+                alert("Your cart is empty! Please add some food first.");
+                return;
+            }
+
+            window.location.href = "checkout.html";
+        }
+
+        // Refresh the cart display
+        displayCartPage();
+    </script>
+
+</body>
+</html>

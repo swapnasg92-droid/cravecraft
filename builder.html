@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CraveCraft | Build Your Meal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header>
+        <h1>🍓 CraveCraft</h1>
+
+        <nav>
+            <a href="home.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="builder.html">Builder</a>
+            <a href="cart.html">Cart</a>
+            <a href="orders.html">Orders</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+
+    <!-- Page Heading -->
+    <section class="builder-hero">
+        <h2>Build Your Own Meal 🍔</h2>
+        <p>Choose your favourites and create a meal just the way you like it!</p>
+    </section>
+
+    <!-- Meal Builder -->
+    <main class="builder-container">
+
+        <form id="mealBuilderForm">
+
+            <!-- Choose Main Item -->
+            <section class="builder-section">
+                <h3>1. Choose Your Main Item</h3>
+
+                <label>
+                    <input type="radio" name="mainItem" value="Burger" data-price="100" checked>
+                    🍔 Burger — ₹100
+                </label>
+
+                <label>
+                    <input type="radio" name="mainItem" value="Pizza" data-price="150">
+                    🍕 Pizza — ₹150
+                </label>
+
+                <label>
+                    <input type="radio" name="mainItem" value="Sandwich" data-price="80">
+                    🥪 Sandwich — ₹80
+                </label>
+            </section>
+
+            <!-- Choose Extras -->
+            <section class="builder-section">
+                <h3>2. Add Extra Toppings</h3>
+
+                <label>
+                    <input type="checkbox" name="extra" value="Extra Cheese" data-price="20">
+                    🧀 Extra Cheese — ₹20
+                </label>
+
+                <label>
+                    <input type="checkbox" name="extra" value="Extra Veggies" data-price="15">
+                    🥬 Extra Veggies — ₹15
+                </label>
+
+                <label>
+                    <input type="checkbox" name="extra" value="Jalapenos" data-price="25">
+                    🌶️ Jalapeños — ₹25
+                </label>
+            </section>
+
+            <!-- Choose Side -->
+            <section class="builder-section">
+                <h3>3. Choose a Side</h3>
+
+                <label>
+                    <input type="radio" name="sideItem" value="No Side" data-price="0" checked>
+                    No Side — ₹0
+                </label>
+
+                <label>
+                    <input type="radio" name="sideItem" value="French Fries" data-price="60">
+                    🍟 French Fries — ₹60
+                </label>
+
+                <label>
+                    <input type="radio" name="sideItem" value="Garlic Bread" data-price="70">
+                    🥖 Garlic Bread — ₹70
+                </label>
+            </section>
+
+            <!-- Choose Drink -->
+            <section class="builder-section">
+                <h3>4. Choose a Drink</h3>
+
+                <label>
+                    <input type="radio" name="drinkItem" value="No Drink" data-price="0" checked>
+                    No Drink — ₹0
+                </label>
+
+                <label>
+                    <input type="radio" name="drinkItem" value="Cold Coffee" data-price="90">
+                    🧋 Cold Coffee — ₹90
+                </label>
+
+                <label>
+                    <input type="radio" name="drinkItem" value="Lemon Juice" data-price="50">
+                    🍋 Lemon Juice — ₹50
+                </label>
+            </section>
+
+            <!-- Total -->
+            <section class="builder-summary">
+                <h3>Your Custom Meal</h3>
+
+                <p id="mealDescription">Burger</p>
+
+                <h2>Total: ₹<span id="mealTotal">100</span></h2>
+
+                <button type="button" onclick="addCustomizedFood()">
+                    Add Custom Meal to Cart 🛒
+                </button>
+            </section>
+
+        </form>
+
+    </main>
+
+    <footer>
+        <p>© 2026 CraveCraft | Create Your Favourite Meal ❤️</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <script>
+        // Calculate the meal price
+        function calculateMealTotal() {
+            let total = 0;
+            let description = [];
+
+            // Main item
+            const main = document.querySelector(
+                'input[name="mainItem"]:checked'
+            );
+
+            total += Number(main.dataset.price);
+            description.push(main.value);
+
+            // Extra toppings
+            const extras = document.querySelectorAll(
+                'input[name="extra"]:checked'
+            );
+
+            extras.forEach(function (item) {
+                total += Number(item.dataset.price);
+                description.push(item.value);
+            });
+
+            // Side item
+            const side = document.querySelector(
+                'input[name="sideItem"]:checked'
+            );
+
+            total += Number(side.dataset.price);
+
+            if (side.value !== "No Side") {
+                description.push(side.value);
+            }
+
+            // Drink
+            const drink = document.querySelector(
+                'input[name="drinkItem"]:checked'
+            );
+
+            total += Number(drink.dataset.price);
+
+            if (drink.value !== "No Drink") {
+                description.push(drink.value);
+            }
+
+            // Show total and meal details
+            document.getElementById("mealTotal").textContent = total;
+
+            document.getElementById("mealDescription").textContent =
+                description.join(" + ");
+        }
+
+        // Update price whenever an option changes
+        document.getElementById("mealBuilderForm").addEventListener(
+            "change",
+            calculateMealTotal
+        );
+
+        // Connect the chosen meal to the existing cart function
+        function addCustomizedFood() {
+            const main = document.querySelector(
+                'input[name="mainItem"]:checked'
+            );
+
+            const extras = document.querySelectorAll(
+                'input[name="extra"]:checked'
+            );
+
+            const side = document.querySelector(
+                'input[name="sideItem"]:checked'
+            );
+
+            const drink = document.querySelector(
+                'input[name="drinkItem"]:checked'
+            );
+
+            let details = [main.value];
+
+            extras.forEach(function (item) {
+                details.push(item.value);
+            });
+
+            if (side.value !== "No Side") {
+                details.push(side.value);
+            }
+
+            if (drink.value !== "No Drink") {
+                details.push(drink.value);
+            }
+
+            const total = Number(
+                document.getElementById("mealTotal").textContent
+            );
+
+            const customMeal = {
+                id: "custom-" + Date.now(),
+                name: "Custom Meal",
+                details: details.join(" + "),
+                price: total,
+                quantity: 1
+            };
+
+            let cart = JSON.parse(
+                localStorage.getItem("craveCraftCart")
+            ) || [];
+
+            cart.push(customMeal);
+
+            localStorage.setItem(
+                "craveCraftCart",
+                JSON.stringify(cart)
+            );
+
+            alert("Your custom meal has been added to the cart!");
+
+            window.location.href = "cart.html";
+        }
+
+        // Display the initial price
+        calculateMealTotal();
+    </script>
+
+</body>
+</html>
+

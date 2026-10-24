@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CraveCraft | Menu</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <h1>🍔 CraveCraft</h1>
+        <p>Your food, your choice!</p>
+
+        <nav>
+            <a href="home.html">Home</a>
+            <a href="menu.html" class="active">Menu</a>
+            <a href="builder.html">Food Builder</a>
+            <a href="cart.html">Cart</a>
+            <a href="orders.html">My Orders</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- MENU INTRODUCTION -->
+        <section class="menu-hero">
+            <p class="menu-label">FRESH • TASTY • DELICIOUS</p>
+
+            <h2>Our Delicious Menu 🍽️</h2>
+
+            <p>
+                Discover your favourites and add something delicious
+                to your cart.
+            </p>
+        </section>
+
+        <!-- SWEET FOOD -->
+        <section>
+            <h2>🍰 Sweet Treats</h2>
+
+            <div class="menu-grid">
+
+                <div class="menu-card">
+                    <div class="menu-picture sweet-picture">🍰</div>
+                    <h3>Chocolate Cake</h3>
+                    <p>Rich and delicious chocolate cake.</p>
+                    <p class="price">₹120</p>
+
+                    <button onclick="addToCart('Chocolate Cake', 120)">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-picture sweet-picture">🍩</div>
+                    <h3>Chocolate Donut</h3>
+                    <p>A soft donut with chocolate topping.</p>
+                    <p class="price">₹80</p>
+
+                    <button onclick="addToCart('Chocolate Donut', 80)">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-picture sweet-picture">🍦</div>
+                    <h3>Vanilla Ice Cream</h3>
+                    <p>Cool, creamy and sweet ice cream.</p>
+                    <p class="price">₹60</p>
+
+                    <button onclick="addToCart('Vanilla Ice Cream', 60)">
+                        Add to Cart
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SPICY FOOD -->
+        <section>
+            <h2>🌶️ Spicy Favourites</h2>
+
+            <div class="menu-grid">
+
+                <div class="menu-card">
+                    <div class="menu-picture spicy-picture">🍔</div>
+                    <h3>Classic Burger</h3>
+                    <p>A tasty burger with fresh ingredients.</p>
+                    <p class="price">₹100</p>
+
+                    <button onclick="addToCart('Classic Burger', 100)">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-picture spicy-picture">🍕</div>
+                    <h3>Cheese Pizza</h3>
+                    <p>Delicious pizza topped with cheese.</p>
+                    <p class="price">₹150</p>
+
+                    <button onclick="addToCart('Cheese Pizza', 150)">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-picture spicy-picture">🍟</div>
+                    <h3>Spicy French Fries</h3>
+                    <p>Crispy fries with a spicy flavour.</p>
+                    <p class="price">₹90</p>
+
+                    <button onclick="addToCart('Spicy French Fries', 90)">
+                        Add to Cart
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FRESH AND HEALTHY FOOD -->
+        <section>
+            <h2>🥗 Fresh & Healthy</h2>
+
+            <div class="menu-grid">
+
+                <!-- HEALTHY BOWL WITH CUSTOMIZATION -->
+                <div class="menu-card">
+                    <div class="menu-picture fresh-picture">🥗</div>
+
+                    <h3>Healthy Bowl</h3>
+
+                    <p>A fresh bowl with healthy ingredients.</p>
+
+                    <p class="price">₹120</p>
+
+                    <a href="builder.html" class="button customize-button">
+                        Customize Your Meal
+                    </a>
+
+                    <button onclick="addToCart('Healthy Bowl', 120)">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-picture fresh-picture">🥪</div>
+
+                    <h3>Veg Sandwich</h3>
+
+                    <p>A fresh sandwich filled with vegetables.</p>
+
+                    <p class="price">₹80</p>
+
+                    <button onclick="addToCart('Veg Sandwich', 80)">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-picture fresh-picture">🍉</div>
+
+                    <h3>Fruit Bowl</h3>
+
+                    <p>A colourful bowl of fresh fruits.</p>
+
+                    <p class="price">₹100</p>
+
+                    <button onclick="addToCart('Fruit Bowl', 100)">
+                        Add to Cart
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- DRINKS -->
+        <section>
+            <h2>🥤 Cool Drinks</h2>
+
+            <div class="menu-grid">
+
+                <div class="menu-card">
+                    <div class="menu-picture drink-picture">🥤</div>
+
+                    <h3>Cold Coffee</h3>
+
+                    <p>A refreshing cold coffee drink.</p>
+
+                    <p class="price">₹90</p>
+
+                    <button onclick="addToCart('Cold Coffee', 90)">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-picture drink-picture">🍓</div>
+
+                    <h3>Strawberry Shake</h3>
+
+                    <p>A sweet and creamy strawberry shake.</p>
+
+                    <p class="price">₹110</p>
+
+                    <button onclick="addToCart('Strawberry Shake', 110)">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <div class="menu-card">
+                    <div class="menu-picture drink-picture">🍋</div>
+
+                    <h3>Lemon Juice</h3>
+
+                    <p>A refreshing lemon drink.</p>
+
+                    <p class="price">₹50</p>
+
+                    <button onclick="addToCart('Lemon Juice', 50)">
+                        Add to Cart
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CUSTOM FOOD BUILDER -->
+        <section class="menu-builder-banner">
+            <h2>🎨 Create Your Own Meal!</h2>
+
+            <p>
+                Choose your favourite food and ingredients to create
+                a meal just the way you like it.
+            </p>
+
+            <a href="builder.html" class="button">
+                Build Your Own Meal
+            </a>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>🍔 CraveCraft | Made with love for food lovers.</p>
+    </footer>
+
+    <script src="script.js"defer></script>
+
+</body>
+
+</html>
+

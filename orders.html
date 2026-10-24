@@ -1,0 +1,574 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CraveCraft | Live Order Tracking</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Leaflet Map CSS -->
+    
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"
+/>
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js">
+</script>
+
+
+
+    <style>
+        .tracking-container {
+            max-width: 900px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .tracking-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 22px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .tracking-card h2 {
+            color: #6b245e;
+            margin-bottom: 15px;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 9px 16px;
+            background: #fff0c2;
+            color: #805800;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .progress-tracker {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 30px 0;
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .progress-icon {
+            width: 45px;
+            height: 45px;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .progress-step.active {
+            color: #6b245e;
+            font-weight: bold;
+        }
+
+        .progress-step.active .progress-icon {
+            background: #ffd5e8;
+            border: 2px solid #6b245e;
+        }
+
+        .order-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .track-button {
+            display: inline-block;
+            padding: 12px 22px;
+            background: #6b245e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            margin: 8px 5px 0 0;
+            font-size: 15px;
+        }
+
+        .track-button:hover {
+            opacity: 0.88;
+        }
+
+        #trackingMessage,
+        #gpsMessage {
+            margin-top: 15px;
+            color: #6b245e;
+            overflow-wrap: anywhere;
+        }
+
+        #liveMap {
+            width: 100%;
+            height: 380px;
+            border-radius: 14px;
+            margin-top: 18px;
+            background: #e8e8e8;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .gps-badge {
+            display: inline-block;
+            background: #e5f8ec;
+            color: #176b37;
+            border-radius: 20px;
+            padding: 7px 12px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 550px) {
+            .tracking-container {
+                padding: 12px;
+            }
+
+            .tracking-card {
+                padding: 18px;
+            }
+
+            .progress-tracker {
+                gap: 3px;
+            }
+
+            .progress-step {
+                font-size: 10px;
+            }
+
+            .progress-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+
+            #liveMap {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🍓 CraveCraft</h1>
+
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="cart.html">Cart</a>
+        <a href="orders.html">Track Order</a>
+        <a href="admin.html">Admin</a>
+    </nav>
+</header>
+
+<main class="tracking-container">
+
+    <!-- Order Search -->
+    <section class="tracking-card">
+
+        <h2>🛵 Track Your Order</h2>
+
+        <p>Enter your order ID to view your order status and delivery location.</p>
+
+        <label for="orderIdInput">Order ID</label>
+
+        <input
+            type="text"
+            id="orderIdInput"
+            placeholder="Enter your order ID"
+            autocomplete="off"
+            style="width:100%;padding:12px;margin:12px 0;box-sizing:border-box;"
+        >
+
+        <button class="track-button" id="trackButton" type="button">
+            Track Order 🔍
+        </button>
+
+        <p id="trackingMessage" role="status" aria-live="polite"></p>
+
+    </section>
+
+    <!-- Order Details -->
+    <section class="tracking-card" id="orderDetails" style="display:none;">
+
+        <h2>📦 Order Details</h2>
+
+        <p><strong>Order ID:</strong> <span id="orderId"></span></p>
+        <p><strong>Customer:</strong> <span id="customerName"></span></p>
+        <p><strong>Total:</strong> ₹<span id="orderTotal"></span></p>
+        <p><strong>Placed:</strong> <span id="orderDate"></span></p>
+
+        <h3>🍔 Your Items</h3>
+        <div id="orderItems"></div>
+
+        <h3 style="margin-top:25px;">📍 Delivery Progress</h3>
+
+        <p>
+            Current status:
+            <span class="order-status" id="currentStatus"></span>
+        </p>
+
+        <div class="progress-tracker">
+
+            <div class="progress-step" data-status="Order Placed">
+                <div class="progress-icon">📝</div>
+                <div>Placed</div>
+            </div>
+
+            <div class="progress-step" data-status="Preparing">
+                <div class="progress-icon">👨‍🍳</div>
+                <div>Preparing</div>
+            </div>
+
+            <div class="progress-step" data-status="Ready for Pickup">
+                <div class="progress-icon">🍱</div>
+                <div>Ready</div>
+            </div>
+
+            <div class="progress-step" data-status="Out for Delivery">
+                <div class="progress-icon">🛵</div>
+                <div>On the way</div>
+            </div>
+
+            <div class="progress-step" data-status="Delivered">
+                <div class="progress-icon">✅</div>
+                <div>Delivered</div>
+            </div>
+
+        </div>
+
+        <p id="deliveryMessage"></p>
+        <p id="lastUpdated"></p>
+
+        <button class="track-button" id="refreshButton" type="button">
+            🔄 Refresh Status
+        </button>
+
+        <a href="menu.html" class="track-button">Order More 🍕</a>
+
+    </section>
+
+    <!-- Live Map -->
+    <section class="tracking-card" id="mapCard" style="display:none;">
+
+        <h2>🗺️ Live Delivery Map</h2>
+
+        <span class="gps-badge" id="gpsBadge">
+            ⚪ Waiting for GPS
+        </span>
+
+        <p id="gpsMessage" role="status" aria-live="polite">
+            Waiting for the delivery person to share their location.
+        </p>
+
+        <div id="liveMap"></div>
+
+        <p>
+            🛵 The marker shows the latest GPS location received from the delivery person.
+        </p>
+
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 CraveCraft | Made with ❤️ for Food Lovers</p>
+</footer>
+
+<!-- Leaflet Map JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+"use strict";
+
+let currentOrderId = "";
+let liveMap = null;
+let deliveryMarker = null;
+let refreshInProgress = false;
+
+const trackingMessage = document.getElementById("trackingMessage");
+const gpsMessage = document.getElementById("gpsMessage");
+const gpsBadge = document.getElementById("gpsBadge");
+
+document.getElementById("trackButton").addEventListener("click", findOrder);
+document.getElementById("refreshButton").addEventListener("click", refreshOrder);
+
+document.getElementById("orderIdInput").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        findOrder();
+    }
+});
+
+async function findOrder() {
+    const input = document.getElementById("orderIdInput");
+    const orderId = input.value.trim();
+
+    if (!orderId) {
+        trackingMessage.textContent = "Please enter your order ID.";
+        return;
+    }
+
+    if (currentOrderId !== orderId) {
+        currentOrderId = orderId;
+
+        if (liveMap) {
+            liveMap.remove();
+            liveMap = null;
+        }
+
+        deliveryMarker = null;
+    }
+
+    await refreshOrder();
+}
+
+async function refreshOrder() {
+    if (!currentOrderId || refreshInProgress) {
+        return;
+    }
+
+    refreshInProgress = true;
+
+    try {
+        const response = await fetch(
+            "/api/orders/" + encodeURIComponent(currentOrderId),
+            { cache: "no-store" }
+        );
+
+        let data;
+
+        try {
+            data = await response.json();
+        } catch {
+            throw new Error("The server returned an invalid response.");
+        }
+
+        if (!response.ok || !data.success || !data.order) {
+            document.getElementById("orderDetails").style.display = "none";
+            document.getElementById("mapCard").style.display = "none";
+
+            trackingMessage.textContent =
+                data.message || "Order not found. Please check your order ID.";
+
+            return;
+        }
+
+        const order = data.order;
+
+        document.getElementById("orderDetails").style.display = "block";
+        document.getElementById("mapCard").style.display = "block";
+
+        displayOrder(order);
+        initializeMap();
+
+        if (order.location) {
+            updateDeliveryLocation(order.location);
+        } else {
+            gpsBadge.textContent = "⚪ Waiting for GPS";
+
+            gpsMessage.textContent =
+                "No GPS location received yet. Start GPS sharing on the delivery page.";
+        }
+
+    } catch (error) {
+        console.error("Tracking error:", error);
+
+        trackingMessage.textContent =
+            "Could not load the order. Make sure the server is running.";
+    } finally {
+        refreshInProgress = false;
+    }
+}
+
+function displayOrder(order) {
+    document.getElementById("orderId").textContent = order.id || "";
+
+    document.getElementById("customerName").textContent =
+        order.customerName || "Customer";
+
+    document.getElementById("orderTotal").textContent =
+        (Number(order.total) || 0).toFixed(2);
+
+    document.getElementById("orderDate").textContent =
+        order.createdAt
+            ? new Date(order.createdAt).toLocaleString()
+            : "Not available";
+
+    const status = order.status || "Order Placed";
+
+    document.getElementById("currentStatus").textContent = status;
+
+    const itemsContainer = document.getElementById("orderItems");
+    itemsContainer.replaceChildren();
+
+    (Array.isArray(order.items) ? order.items : []).forEach(function(item) {
+        const row = document.createElement("div");
+        row.className = "order-item";
+
+        const quantity = Number(item.quantity) || 1;
+        const price = Number(item.price) || 0;
+
+        row.textContent =
+            `${item.name || "Food item"} × ${quantity} — ₹${(price * quantity).toFixed(2)}`;
+
+        itemsContainer.appendChild(row);
+    });
+
+    const steps = [
+        "Order Placed",
+        "Preparing",
+        "Ready for Pickup",
+        "Out for Delivery",
+        "Delivered"
+    ];
+
+    const currentIndex = steps.indexOf(status);
+
+    document.querySelectorAll(".progress-step").forEach(function(step) {
+        const stepIndex = steps.indexOf(step.dataset.status);
+
+        step.classList.toggle(
+            "active",
+            currentIndex >= 0 && stepIndex <= currentIndex
+        );
+    });
+
+    const messages = {
+        "Order Placed": "🎉 Your order has been received!",
+        "Preparing": "👨‍🍳 Your food is being prepared.",
+        "Ready for Pickup": "🍱 Your food is ready for pickup.",
+        "Out for Delivery": "🛵 Your order is on its way!",
+        "Delivered": "🎉 Your order has been delivered. Enjoy!",
+        "Cancelled": "❌ This order has been cancelled."
+    };
+
+    document.getElementById("deliveryMessage").textContent =
+        messages[status] || "Your order is being processed.";
+
+    document.getElementById("lastUpdated").textContent =
+        "Last checked: " + new Date().toLocaleTimeString();
+
+    trackingMessage.textContent = "Order information loaded successfully!";
+}
+
+/* Initialize the map and show useful messages if map tiles fail. */
+function initializeMap() {
+    if (liveMap) {
+        return;
+    }
+
+    if (typeof L === "undefined") {
+        document.getElementById("liveMap").textContent =
+            "Map library failed to load. Check your internet connection and refresh.";
+        return;
+    }
+
+    liveMap = L.map("liveMap").setView([20.5937, 78.9629], 5);
+
+    const tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(liveMap);
+
+    tileLayer.on("tileerror", function() {
+        gpsMessage.textContent =
+            "Map tiles could not load. Check your internet connection or try again later.";
+    });
+
+    liveMap.on("load", function() {
+        gpsMessage.textContent =
+            "Map loaded. Waiting for the delivery person's GPS location.";
+    });
+
+    setTimeout(function() {
+        if (liveMap) {
+            liveMap.invalidateSize(true);
+        }
+    }, 300);
+}
+
+
+/* Display or update the delivery marker. */
+function updateDeliveryLocation(location) {
+    const latitude = Number(location.latitude);
+    const longitude = Number(location.longitude);
+
+    if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude) ||
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180
+    ) {
+        gpsBadge.textContent = "⚠️ Invalid GPS";
+        gpsMessage.textContent = "The GPS coordinates are invalid.";
+        return;
+    }
+
+    initializeMap();
+
+    if (!liveMap) {
+        return;
+    }
+
+    const coordinates = [latitude, longitude];
+
+    if (!deliveryMarker) {
+        deliveryMarker = L.marker(coordinates)
+            .addTo(liveMap)
+            .bindPopup("🛵 Delivery person's location");
+
+        deliveryMarker.openPopup();
+    } else {
+        deliveryMarker.setLatLng(coordinates);
+    }
+
+    liveMap.setView(coordinates, 16);
+    liveMap.invalidateSize(true);
+
+    gpsBadge.textContent = "🟢 GPS location received";
+
+    gpsMessage.textContent =
+        "Last GPS update: " +
+        new Date(location.updatedAt || Date.now()).toLocaleTimeString();
+}
+
+/* Refresh order status and location every five seconds. */
+setInterval(function() {
+    if (currentOrderId) {
+        refreshOrder();
+    }
+}, 5000);
+
+/* Support a URL such as orders.html?id=YOUR_ORDER_ID */
+const urlOrderId = new URLSearchParams(window.location.search).get("id");
+
+if (urlOrderId) {
+    document.getElementById("orderIdInput").value = urlOrderId;
+    findOrder();
+}
+</script>
+
+</body>
+</html>
+

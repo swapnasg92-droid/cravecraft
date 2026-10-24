@@ -1,0 +1,680 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CraveCraft | Delivery GPS Tracking</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #fff8f4;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        header {
+            background: #6b245e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 12px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .delivery-container {
+            max-width: 650px;
+            margin: 35px auto;
+            padding: 15px;
+        }
+
+        .delivery-card {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .delivery-card h2 {
+            color: #6b245e;
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin: 18px 0;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .delivery-button {
+            display: inline-block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            background: #6b245e;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .delivery-button:hover {
+            opacity: 0.9;
+        }
+
+        .stop-button {
+            background: #d93636;
+        }
+
+        .secondary-button {
+            background: #333;
+        }
+
+        .status-box {
+            padding: 15px;
+            border-radius: 12px;
+            background: #f5f0f5;
+            margin-top: 18px;
+            overflow-wrap: anywhere;
+        }
+
+        .status-box p {
+            margin: 8px 0;
+        }
+
+        .status-label {
+            display: inline-block;
+            padding: 7px 12px;
+            background: #eee;
+            color: #555;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .status-label.active {
+            background: #e1f7e8;
+            color: #176b37;
+        }
+
+        .status-label.error {
+            background: #ffe4e4;
+            color: #a00000;
+        }
+
+        .help-text {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        @media (max-width: 500px) {
+            .delivery-container {
+                margin: 15px auto;
+            }
+
+            .delivery-card {
+                padding: 18px;
+            }
+
+            nav {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🍓 CraveCraft</h1>
+    <p>Delivery Partner GPS Dashboard 🛵</p>
+
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="orders.html">Track Order</a>
+        <a href="admin.html">Admin</a>
+    </nav>
+</header>
+
+<main class="delivery-container">
+
+    <section class="delivery-card">
+        <h2>📦 Delivery Order</h2>
+
+        <p>
+            Enter the order ID assigned to you before starting GPS sharing.
+        </p>
+
+        <div class="form-group">
+            <label for="orderIdInput">Order ID</label>
+
+            <input
+                type="text"
+                id="orderIdInput"
+                placeholder="Enter customer order ID"
+                autocomplete="off"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="deliveryStatus">Delivery Status</label>
+
+            <select id="deliveryStatus">
+                <option value="Order Placed">Order Placed</option>
+                <option value="Preparing">Preparing</option>
+                <option value="Ready for Pickup">Ready for Pickup</option>
+                <option value="Out for Delivery">Out for Delivery</option>
+                <option value="Delivered">Delivered</option>
+            </select>
+        </div>
+
+        <button
+            type="button"
+            class="delivery-button secondary-button"
+            id="updateStatusButton"
+        >
+            Update Order Status
+        </button>
+
+        <p class="help-text">
+            Only update orders assigned to you. GPS sharing sends your
+            device's location to the server for the selected order.
+        </p>
+    </section>
+
+    <section class="delivery-card">
+        <h2>📍 Live GPS Sharing</h2>
+
+        <p>
+            Press Start GPS Tracking and allow location access when your
+            phone asks for permission.
+        </p>
+
+        <div class="status-box">
+            <p>
+                <strong>Tracking:</strong>
+                <span class="status-label" id="trackingBadge">
+                    Not started
+                </span>
+            </p>
+
+            <p>
+                <strong>GPS latitude:</strong>
+                <span id="latitude">Not available</span>
+            </p>
+
+            <p>
+                <strong>GPS longitude:</strong>
+                <span id="longitude">Not available</span>
+            </p>
+
+            <p>
+                <strong>Last successful upload:</strong>
+                <span id="lastUpdated">Not available</span>
+            </p>
+
+            <p id="gpsMessage" role="status" aria-live="polite">
+                Enter an order ID to begin.
+            </p>
+        </div>
+
+        <button
+            type="button"
+            class="delivery-button"
+            id="startButton"
+        >
+            🟢 Start GPS Tracking
+        </button>
+
+        <button
+            type="button"
+            class="delivery-button stop-button"
+            id="stopButton"
+            disabled
+        >
+            🔴 Stop GPS Tracking
+        </button>
+    </section>
+
+    <section class="delivery-card">
+        <h2>ℹ️ How It Works</h2>
+
+        <p class="help-text">
+            1. Enter the correct customer order ID.<br><br>
+            2. Press Start GPS Tracking.<br><br>
+            3. Allow your browser to access your location.<br><br>
+            4. Keep this page open while sharing your location.<br><br>
+            5. The customer's order-tracking page checks for location
+            updates every five seconds.<br><br>
+            6. Press Stop GPS Tracking when you finish sharing.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 CraveCraft | Made with ❤️ for Food Lovers</p>
+</footer>
+
+<script>
+"use strict";
+
+let watchId = null;
+let activeOrderId = "";
+let uploadInProgress = false;
+let latestPosition = null;
+let lastUploadedPosition = null;
+let uploadTimer = null;
+let trackingSession = 0;
+
+const orderInput = document.getElementById("orderIdInput");
+const startButton = document.getElementById("startButton");
+const stopButton = document.getElementById("stopButton");
+const gpsMessage = document.getElementById("gpsMessage");
+const trackingBadge = document.getElementById("trackingBadge");
+
+startButton.addEventListener("click", startGPSTracking);
+stopButton.addEventListener("click", stopGPSTracking);
+
+document.getElementById("updateStatusButton")
+    .addEventListener("click", updateOrderStatus);
+
+orderInput.addEventListener("input", function() {
+    if (watchId !== null) {
+        gpsMessage.textContent =
+            "Stop GPS tracking before changing the order ID.";
+    }
+});
+
+function setBadge(message, state) {
+    trackingBadge.textContent = message;
+    trackingBadge.className = "status-label";
+
+    if (state) {
+        trackingBadge.classList.add(state);
+    }
+}
+
+function startGPSTracking() {
+    if (watchId !== null) {
+        gpsMessage.textContent = "GPS tracking is already running.";
+        return;
+    }
+
+    const orderId = orderInput.value.trim();
+
+    if (!orderId) {
+        gpsMessage.textContent =
+            "Please enter the customer's order ID first.";
+        orderInput.focus();
+        return;
+    }
+
+    if (!window.isSecureContext) {
+        gpsMessage.textContent =
+            "GPS requires HTTPS on most mobile devices. Open this website using a secure HTTPS address.";
+        setBadge("Secure connection required", "error");
+        return;
+    }
+
+    if (!navigator.geolocation) {
+        gpsMessage.textContent =
+            "Your browser does not support GPS location.";
+        setBadge("GPS unavailable", "error");
+        return;
+    }
+
+    activeOrderId = orderId;
+    latestPosition = null;
+    lastUploadedPosition = null;
+    trackingSession++;
+
+    const session = trackingSession;
+
+    startButton.disabled = true;
+    stopButton.disabled = false;
+
+    setBadge("Waiting for GPS", "");
+    gpsMessage.textContent =
+        "Requesting location permission. Please allow access.";
+
+    navigator.geolocation.getCurrentPosition(
+        async function(position) {
+            if (session !== trackingSession) {
+                return;
+            }
+
+            latestPosition = position;
+
+            document.getElementById("latitude").textContent =
+                position.coords.latitude.toFixed(6);
+
+            document.getElementById("longitude").textContent =
+                position.coords.longitude.toFixed(6);
+
+            gpsMessage.textContent =
+                "GPS received. Checking that the order is valid...";
+
+            const result = await uploadLocation(position, session);
+
+            if (session !== trackingSession) {
+                return;
+            }
+
+            if (!result) {
+                stopGPSTracking();
+                return;
+            }
+
+            setBadge("GPS sharing active", "active");
+
+            gpsMessage.textContent =
+                "Your location is being shared with the order-tracking system.";
+
+            watchId = navigator.geolocation.watchPosition(
+                function(newPosition) {
+                    if (session !== trackingSession) {
+                        return;
+                    }
+
+                    latestPosition = newPosition;
+
+                    document.getElementById("latitude").textContent =
+                        newPosition.coords.latitude.toFixed(6);
+
+                    document.getElementById("longitude").textContent =
+                        newPosition.coords.longitude.toFixed(6);
+
+                    setBadge("GPS sharing active", "active");
+                    gpsMessage.textContent =
+                        "New GPS position received. Sending update...";
+                },
+                function(error) {
+                    if (session !== trackingSession) {
+                        return;
+                    }
+
+                    gpsMessage.textContent = getLocationError(error);
+                    setBadge("Location unavailable", "error");
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 3000,
+                    timeout: 20000
+                }
+            );
+
+            // Upload the newest position periodically, even if the
+            // browser has not delivered another watchPosition event.
+            uploadTimer = setInterval(async function() {
+                if (
+                    session === trackingSession &&
+                    latestPosition &&
+                    !uploadInProgress
+                ) {
+                    await uploadLocation(latestPosition, session);
+                }
+            }, 5000);
+        },
+        function(error) {
+            if (session !== trackingSession) {
+                return;
+            }
+
+            gpsMessage.textContent = getLocationError(error);
+            setBadge("GPS permission needed", "error");
+
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            activeOrderId = "";
+        },
+        {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 20000
+        }
+    );
+}
+
+async function uploadLocation(position, session) {
+    if (
+        uploadInProgress ||
+        !activeOrderId ||
+        session !== trackingSession
+    ) {
+        return false;
+    }
+
+    uploadInProgress = true;
+
+    try {
+        const payload = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+        };
+
+        const response = await fetch(
+            "/api/orders/" +
+            encodeURIComponent(activeOrderId) +
+            "/location",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload),
+                cache: "no-store"
+            }
+        );
+
+        let result;
+
+        try {
+            result = await response.json();
+        } catch {
+            result = {};
+        }
+
+        if (!response.ok || !result.success) {
+            gpsMessage.textContent =
+                result.message ||
+                "The server could not save your GPS location.";
+
+            setBadge("Upload failed", "error");
+
+            return false;
+        }
+
+        lastUploadedPosition = position;
+
+        document.getElementById("lastUpdated").textContent =
+            new Date().toLocaleTimeString();
+
+        gpsMessage.textContent =
+            "GPS location successfully sent to the server.";
+
+        setBadge("GPS sharing active", "active");
+
+        return true;
+
+    } catch (error) {
+        gpsMessage.textContent =
+            "Could not reach the server. Check your internet connection.";
+
+        setBadge("Server connection failed", "error");
+
+        return false;
+
+    } finally {
+        uploadInProgress = false;
+    }
+}
+
+function stopGPSTracking() {
+    trackingSession++;
+
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+    }
+
+    if (uploadTimer !== null) {
+        clearInterval(uploadTimer);
+        uploadTimer = null;
+    }
+
+    latestPosition = null;
+    lastUploadedPosition = null;
+    activeOrderId = "";
+
+    startButton.disabled = false;
+    stopButton.disabled = true;
+
+    setBadge("Tracking stopped", "");
+
+    gpsMessage.textContent =
+        "GPS sharing has stopped. The server may still retain the last saved location.";
+
+    // Note: stopping the browser watcher does not delete the location
+    // previously stored on the server.
+}
+
+async function updateOrderStatus() {
+    const orderId = orderInput.value.trim();
+
+    if (!orderId) {
+        gpsMessage.textContent =
+            "Enter an order ID before updating its status.";
+        return;
+    }
+
+    const status = document.getElementById("deliveryStatus").value;
+
+    try {
+        const response = await fetch(
+            "/api/orders/" +
+            encodeURIComponent(orderId) +
+            "/status",
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ status: status })
+            }
+        );
+
+        let result = {};
+
+        try {
+            result = await response.json();
+        } catch {
+            result = {};
+        }
+
+        if (!response.ok || !result.success) {
+            gpsMessage.textContent =
+                result.message || "Could not update order status.";
+            return;
+        }
+
+        gpsMessage.textContent =
+            "Order status updated to: " + status;
+
+    } catch (error) {
+        gpsMessage.textContent =
+            "Could not contact the server to update order status.";
+    }
+}
+
+function getLocationError(error) {
+    if (error.code === 1) {
+        return "Location permission was denied. Allow location access in your browser settings.";
+    }
+
+    if (error.code === 2) {
+        return "Your current location is unavailable. Check your phone's location settings.";
+    }
+
+    if (error.code === 3) {
+        return "GPS request timed out. Try again in an area with a better GPS signal.";
+    }
+
+    return "Unable to obtain your location. Please try again.";
+}
+
+// If the order ID is supplied in the URL, fill it automatically.
+const urlOrderId = new URLSearchParams(window.location.search).get("id");
+
+if (urlOrderId) {
+    orderInput.value = urlOrderId;
+}
+
+// Stop local GPS watching when the page is being closed.
+window.addEventListener("pagehide", function() {
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+    }
+
+    if (uploadTimer !== null) {
+        clearInterval(uploadTimer);
+        uploadTimer = null;
+    }
+});
+</script>
+
+</body>
+</html>
+

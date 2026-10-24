@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CraveCraft | Checkout</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>🍓 CraveCraft</h1>
+
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="builder.html">Builder</a>
+        <a href="cart.html">Cart</a>
+        <a href="orders.html">Orders</a>
+        <a href="login.html">Login</a>
+        <a href="admin.html">Admin</a>
+    </nav>
+</header>
+
+<main class="checkout-container">
+
+    <section class="checkout-form">
+
+        <h2>🛵 Delivery Details</h2>
+
+        <form id="checkoutForm">
+
+            <label for="customerName">Full Name</label>
+            <input type="text" id="customerName"
+                placeholder="Enter your full name"
+                pattern="[A-Za-z ]+"
+                required>
+
+            <label for="customerPhone">Phone Number</label>
+            <input type="tel" id="customerPhone"
+                placeholder="Enter your 10-digit phone number"
+                pattern="[0-9]{10}"
+                maxlength="10"
+                inputmode="numeric"
+                required>
+
+            <label for="customerCity">City</label>
+            <input type="text" id="customerCity"
+                placeholder="Enter your city"
+                pattern="[A-Za-z ]+"
+                required>
+
+            <label for="customerAddress">Delivery Address</label>
+            <textarea id="customerAddress"
+                placeholder="Enter your complete delivery address"
+                rows="4"
+                required></textarea>
+
+            <h2>💳 Payment Method</h2>
+
+            <div class="payment-option">
+                <label>
+                    <input type="radio" name="payment"
+                        value="Cash on Delivery" required
+                        onchange="updatePaymentFields()">
+                    Cash on Delivery
+                </label>
+            </div>
+
+            <div class="payment-option">
+                <label>
+                    <input type="radio" name="payment"
+                        value="UPI"
+                        onchange="updatePaymentFields()">
+                    UPI
+                </label>
+            </div>
+
+            <div id="upiFields" style="display:none;">
+                <label for="upiId">UPI ID</label>
+                <input type="text" id="upiId"
+                    placeholder="Enter your UPI ID">
+            </div>
+
+            <div class="payment-option">
+                <label>
+                    <input type="radio" name="payment"
+                        value="Credit Card"
+                        onchange="updatePaymentFields()">
+                    Credit Card
+                </label>
+            </div>
+
+            <div id="cardFields" style="display:none;">
+                <label for="cardName">Name on Card</label>
+                <input type="text" id="cardName"
+                    placeholder="Enter cardholder name">
+
+                <label for="cardNumber">Card Number</label>
+                <input type="text" id="cardNumber"
+                    placeholder="Card payments are not connected"
+                    disabled>
+
+                <p>Online card payments are not available in this demo. Select Cash on Delivery to place your order.</p>
+            </div>
+
+            <button type="submit" id="placeOrderButton">
+                Place Order ❤️
+            </button>
+
+            <p id="checkoutMessage" role="status"></p>
+
+        </form>
+
+    </section>
+
+    <section class="checkout-summary">
+
+        <h2>🛒 Your Order Summary</h2>
+
+        <div id="checkoutSummary">
+            <p>Loading your order...</p>
+        </div>
+
+        <a href="cart.html" class="continue-shopping">
+            ← Back to Cart
+        </a>
+
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 CraveCraft | Made with ❤️ for Food Lovers</p>
+</footer>
+
+<script src="script.js"></script>
+
+<script>
+    // Checkout-specific functions
+    const checkoutMessage = document.getElementById("checkoutMessage");
+    const checkoutForm = document.getElementById("checkoutForm");
+
+    function updatePaymentFields() {
+        const payment = document.querySelector(
+            'input[name="payment"]:checked'
+        )?.value;
+
+        document.getElementById("upiFields").style.display =
+            payment === "UPI" ? "block" : "none";
+
+        document.getElementById("cardFields").style.display =
+            payment === "Credit Card" ? "block" : "none";
+    }
+
+    function getCartItems() {
+        // Supports common cart storage names used by existing projects.
+        const possibleKeys = ["cart", "craveCraftCart", "shoppingCart"];
+
+        for (const key of possibleKeys) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key));
+
+                if (Array.isArray(value) && value.length > 0) {
+                    return value;
+                }
+            } catch (error) {
+                // Try the next storage key.
+            }
+        }
+
+        return [];
+    }
+
+    function displayCheckoutSummary() {
+        const container = document.getElementById("checkoutSummary");
+        const items = getCartItems();
+
+        if (items.length === 0) {
+            container.textContent = "";
+
+            const message = document.createElement("p");
+            message.textContent =
+                "Your cart is empty or uses a different storage format. Please check your cart.";
+            container.appendChild(message);
+            return;
+        }
+
+        let total = 0;
+        container.textContent = "";
+
+        items.forEach(item => {
+            const name = item.name || item.title || item.foodName || "Food item";
+            const quantity = Number(item.quantity ?? item.qty ?? 1);
+            const price = Number(item.price ?? item.cost ?? 0);
+
+            total += price * quantity;
+
+            const row = document.createElement("p");
+            row.textContent =
+                `${name} × ${quantity} — ₹${(price * quantity).toFixed(2)}`;
+
+            container.appendChild(row);
+        });
+
+        const totalElement = document.createElement("h3");
+        totalElement.textContent = `Total: ₹${total.toFixed(2)}`;
+        container.appendChild(totalElement);
+    }
+
+    checkoutForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        if (!checkoutForm.reportValidity()) {
+            return;
+        }
+
+        const items = getCartItems();
+
+        if (items.length === 0) {
+            checkoutMessage.textContent =
+                "Your cart is empty. Add food items before placing an order.";
+            return;
+        }
+
+        const payment = document.querySelector(
+            'input[name="payment"]:checked'
+        )?.value;
+
+        if (payment !== "Cash on Delivery") {
+            checkoutMessage.textContent =
+                "For this demo, please select Cash on Delivery. Online payments are not connected.";
+            return;
+        }
+
+        const customerName =
+            document.getElementById("customerName").value.trim();
+
+        const phone =
+            document.getElementById("customerPhone").value.trim();
+
+        const city =
+            document.getElementById("customerCity").value.trim();
+
+        const address =
+            document.getElementById("customerAddress").value.trim();
+
+        const total = items.reduce((sum, item) => {
+            const price = Number(item.price ?? item.cost ?? 0);
+            const quantity = Number(item.quantity ?? item.qty ?? 1);
+
+            return sum + price * quantity;
+        }, 0);
+
+        const button = document.getElementById("placeOrderButton");
+        button.disabled = true;
+        checkoutMessage.textContent = "Placing your order...";
+
+        try {
+            const response = await fetch("/api/orders", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    customerName,
+                    phone,
+                    city,
+                    address,
+                    payment,
+                    items,
+                    total
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Unable to place order.");
+            }
+
+            localStorage.setItem(
+                "lastCraveCraftOrder",
+                JSON.stringify(result.order)
+            );
+
+            // Clear the cart only after the server confirms the order.
+            ["cart", "craveCraftCart", "shoppingCart"].forEach(key => {
+                try {
+                    const stored = JSON.parse(localStorage.getItem(key));
+
+                    if (Array.isArray(stored)) {
+                        localStorage.removeItem(key);
+                    }
+                } catch (error) {
+                    // Leave unrelated storage untouched.
+                }
+            });
+
+            checkoutMessage.textContent =
+                `Order placed successfully! Your order ID is ${result.order.id}.`;
+
+            checkoutForm.reset();
+            updatePaymentFields();
+
+            document.getElementById("checkoutSummary").textContent =
+                "Your order has been placed successfully!";
+
+            alert(
+                `Thank you for ordering from CraveCraft!\nOrder ID: ${result.order.id}`
+            );
+
+        } catch (error) {
+            console.error("Checkout error:", error);
+
+            checkoutMessage.textContent =
+                "Could not place your order. Make sure the CraveCraft server is running and try again.";
+        } finally {
+            button.disabled = false;
+        }
+    });
+
+    displayCheckoutSummary();
+    updatePaymentFields();
+</script>
+
+</body>
+</html>

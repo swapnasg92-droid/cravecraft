@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CraveCraft | Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<header>
+    <h1>🍓 CraveCraft</h1>
+
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="builder.html">Builder</a>
+        <a href="cart.html">Cart</a>
+        <a href="orders.html">Orders</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+        <a href="admin.html">Admin</a>
+    </nav>
+</header>
+
+<main class="register-container">
+
+    <section class="register-card">
+
+        <div class="register-icon">🍰</div>
+
+        <h2>Create Your Account!</h2>
+
+        <p class="register-description">
+            Join CraveCraft and enjoy your favourite food.
+        </p>
+
+        <form id="registerForm" onsubmit="return false;">
+
+            <label for="registerName">Full Name</label>
+            <input
+                type="text"
+                id="registerName"
+                placeholder="Enter your full name"
+                pattern="[A-Za-z ]+"
+                title="Name must contain only letters and spaces."
+                required>
+
+            <label for="registerPhone">Phone Number</label>
+            <input
+                type="tel"
+                id="registerPhone"
+                placeholder="Enter your 10-digit phone number"
+                pattern="[0-9]{10}"
+                maxlength="10"
+                inputmode="numeric"
+                title="Enter exactly 10 digits."
+                required>
+
+            <label for="registerEmail">Email Address</label>
+            <input
+                type="email"
+                id="registerEmail"
+                placeholder="Enter your email"
+                required>
+
+            <label for="registerPassword">Password</label>
+            <input
+                type="password"
+                id="registerPassword"
+                placeholder="Create a password"
+                minlength="8"
+                pattern="(?=.*[A-Za-z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}"
+                title="Use at least 8 characters, including a letter, a number, and a special character."
+                required>
+
+            <label for="confirmPassword">Confirm Password</label>
+            <input
+                type="password"
+                id="confirmPassword"
+                placeholder="Enter your password again"
+                required>
+
+            <button type="button" onclick="validateAndRegister()">
+                Create Account ❤️
+            </button>
+
+        </form>
+
+        <p class="login-link">
+            Already have an account?
+            <a href="login.html">Login here</a>
+        </p>
+
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 CraveCraft | Made with ❤️ for Food Lovers</p>
+</footer>
+
+<script src="script.js"></script>
+
+<script>
+    function validateAndRegister() {
+        const form = document.getElementById("registerForm");
+        const password = document.getElementById("registerPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match. Please try again!");
+            return;
+        }
+
+        registerUser();
+    }
+</script>
+
+
+</body>
+</html>

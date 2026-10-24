@@ -1,0 +1,49 @@
+[
+  {
+    "id": "CC1792761503271",
+    "customerName": "swapna",
+    "phone": "1234567890",
+    "items": [
+      {
+        "name": "Lemon Juice",
+        "price": 50,
+        "image": "",
+        "quantity": 1
+      }
+    ],
+    "total": 50,
+    "status": "Out for Delivery",
+    "createdAt": "2026-10-23T13:18:23.271Z",
+    "updatedAt": "2026-10-23T15:53:59.909Z",
+    "location": {
+      "latitude": 13.439200616007756,
+      "longitude": 77.724946552122,
+      "updatedAt": "2026-10-23T15:36:56.761Z"
+    }
+  },
+  {
+    "id": "CC1792765046350",
+    "customerName": "roopna",
+    "phone": "1233456789",
+    "items": [
+      {
+        "name": "Spicy French Fries",
+        "price": 90,
+        "image": "",
+        "quantity": 1
+      },
+      {
+        "id": "custom-1792764911849",
+        "name": "Custom Meal",
+        "details": "Pizza + Jalapenos + French Fries + Cold Coffee",
+        "price": 325,
+        "quantity": 1
+      }
+    ],
+    "total": 415,
+    "status": "Delivered",
+    "location": null,
+    "createdAt": "2026-10-23T14:17:26.350Z",
+    "updatedAt": "2026-10-23T15:55:18.960Z"
+  }
+]

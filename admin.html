@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CraveCraft | Admin Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .admin-container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .admin-hero,
+        .admin-section {
+            background: #fff;
+            padding: 24px;
+            margin-bottom: 25px;
+            border-radius: 16px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .admin-section h2,
+        .admin-hero h2 {
+            color: #6b245e;
+            margin-bottom: 16px;
+        }
+
+        .admin-section input,
+        .admin-section select,
+        .admin-section textarea {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin: 8px 0 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .admin-section button {
+            padding: 11px 17px;
+            margin: 8px 5px 8px 0;
+            border: none;
+            border-radius: 9px;
+            background: #6b245e;
+            color: white;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .admin-section button:hover {
+            opacity: 0.88;
+        }
+
+        .admin-section button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .admin-order-card,
+        .admin-food-card,
+        .admin-user-card {
+            padding: 18px;
+            margin: 15px 0;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            background: #fffafc;
+            overflow-wrap: anywhere;
+        }
+
+        .admin-order-card h3 {
+            color: #6b245e;
+        }
+
+        .current-status {
+            display: inline-block;
+            padding: 7px 12px;
+            background: #ffedc2;
+            border-radius: 18px;
+            font-weight: bold;
+        }
+
+        .admin-order-card select {
+            max-width: 100%;
+        }
+
+        .admin-message {
+            margin: 12px 0;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .admin-container {
+                padding: 10px;
+            }
+
+            .admin-section,
+            .admin-hero {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🍓 CraveCraft</h1>
+
+        <nav>
+            <a href="home.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="builder.html">Builder</a>
+            <a href="cart.html">Cart</a>
+            <a href="orders.html">Track Order</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+
+        <section class="admin-hero">
+            <h2>🍓 Admin Dashboard</h2>
+            <p>Manage food items, customers, and orders in one place.</p>
+            <p id="serverStatus" class="admin-message">
+                Connecting to CraveCraft server...
+            </p>
+        </section>
+
+        <!-- ADD FOOD -->
+        <section class="admin-section">
+            <h2>🍔 Add New Food Item</h2>
+
+            <form id="adminFoodForm">
+
+                <label for="foodName">Food Name</label>
+                <input type="text" id="foodName"
+                       placeholder="Enter food name" required>
+
+                <label for="foodPrice">Food Price (₹)</label>
+                <input type="number" id="foodPrice"
+                       placeholder="Enter food price" min="1" required>
+
+                <label for="foodCategory">Food Category</label>
+                <select id="foodCategory" required>
+                    <option value="">Select a category</option>
+                    <option value="Sweet">Sweet</option>
+                    <option value="Spicy">Spicy</option>
+                    <option value="Fresh">Fresh</option>
+                    <option value="Drinks">Drinks</option>
+                </select>
+
+                <label for="foodImage">Food Image URL</label>
+                <input type="url" id="foodImage"
+                       placeholder="Paste an image URL">
+
+                <label for="foodDescription">Food Description</label>
+                <textarea id="foodDescription"
+                          placeholder="Enter a short description"
+                          rows="3"></textarea>
+
+                <button type="submit">➕ Add Food Item</button>
+            </form>
+
+            <p id="foodMessage" class="admin-message"></p>
+        </section>
+
+        <!-- MANAGE FOOD -->
+        <section class="admin-section">
+            <h2>🍕 Manage Food Items</h2>
+
+            <div id="adminFoodList">
+                <p>Loading food items...</p>
+            </div>
+
+            <button type="button" id="refreshFoodsButton">
+                🔄 Refresh Food Items
+            </button>
+        </section>
+
+        <!-- CUSTOMERS -->
+        <section class="admin-section">
+            <h2>👥 Registered Customers</h2>
+
+            <div id="adminUsers">
+                <p>Loading registered customers...</p>
+            </div>
+
+            <button type="button" id="viewCustomersButton">
+                🔄 View Customers
+            </button>
+        </section>
+
+        <!-- ORDERS -->
+        <section class="admin-section">
+            <h2>🛍️ Customer Orders</h2>
+
+            <p>View customer orders and update their delivery status.</p>
+
+            <div id="adminOrders">
+                <p>Loading customer orders...</p>
+            </div>
+
+            <button type="button" id="viewOrdersButton">
+                🔄 View Orders
+            </button>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 CraveCraft | Made with ❤️ for Food Lovers</p>
+    </footer>
+
+    <!-- Keep this script: it contains your existing project functions. -->
+    <script src="script.js"></script>
+
+    <script>
+        // ========================================
+        // SERVER CONNECTION
+        // ========================================
+
+        async function checkServer() {
+            const status = document.getElementById("serverStatus");
+
+            try {
+                const response = await fetch("/api/status");
+                const data = await response.json();
+
+                status.textContent = data.success
+                    ? "🟢 CraveCraft server connected"
+                    : "🔴 Server connection problem";
+            } catch (error) {
+                status.textContent =
+                    "🔴 Server not reachable. Start server.js first.";
+            }
+        }
+
+
+        // ========================================
+        // CUSTOMER ORDERS AND DELIVERY STATUS
+        // ========================================
+
+        async function showAdminOrders() {
+            const container = document.getElementById("adminOrders");
+
+            container.innerHTML = "<p>Loading orders...</p>";
+
+            try {
+                const response = await fetch("/api/orders");
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error("Unable to retrieve orders.");
+                }
+
+                if (!data.orders || data.orders.length === 0) {
+                    container.innerHTML = "<p>No customer orders found.</p>";
+                    return;
+                }
+
+                container.innerHTML = "";
+
+                data.orders.slice().reverse().forEach(order => {
+                    const card = document.createElement("div");
+                    card.className = "admin-order-card";
+
+                    const heading = document.createElement("h3");
+                    heading.textContent = "📦 Order ID: " + order.id;
+                    card.appendChild(heading);
+
+                    const customer = document.createElement("p");
+                    customer.textContent =
+                        "Customer: " + (order.customerName || "Not provided");
+                    card.appendChild(customer);
+
+                    const phone = document.createElement("p");
+                    phone.textContent =
+                        "Phone: " + (order.phone || "Not provided");
+                    card.appendChild(phone);
+
+                    const total = document.createElement("p");
+                    total.textContent =
+                        "Total: ₹" + Number(order.total || 0).toFixed(2);
+                    card.appendChild(total);
+
+                    const itemsHeading = document.createElement("p");
+                    itemsHeading.textContent = "🍔 Ordered Items:";
+                    card.appendChild(itemsHeading);
+
+                    const itemList = document.createElement("ul");
+
+                    (order.items || []).forEach(item => {
+                        const li = document.createElement("li");
+                        li.textContent =
+                            (item.name || "Food item") +
+                            " × " + (Number(item.quantity) || 1);
+                        itemList.appendChild(li);
+                    });
+
+                    card.appendChild(itemList);
+
+                    const placed = document.createElement("p");
+                    placed.textContent = "Placed: " +
+                        (order.createdAt
+                            ? new Date(order.createdAt).toLocaleString()
+                            : "Unknown");
+                    card.appendChild(placed);
+
+                    const statusText = document.createElement("p");
+                    statusText.textContent = "Current Status: ";
+                    const statusBadge = document.createElement("span");
+                    statusBadge.className = "current-status";
+                    statusBadge.textContent = order.status || "Order Placed";
+                    statusText.appendChild(statusBadge);
+                    card.appendChild(statusText);
+
+                    const label = document.createElement("label");
+                    label.htmlFor = "status-" + order.id;
+                    label.textContent = "Update Delivery Status:";
+                    card.appendChild(label);
+
+                    const select = document.createElement("select");
+                    select.id = "status-" + order.id;
+
+                    const statuses = [
+                        "Order Placed",
+                        "Preparing",
+                        "Ready for Pickup",
+                        "Out for Delivery",
+                        "Delivered",
+                        "Cancelled"
+                    ];
+
+                    statuses.forEach(status => {
+                        const option = document.createElement("option");
+                        option.value = status;
+                        option.textContent = status;
+                        option.selected = status === order.status;
+                        select.appendChild(option);
+                    });
+
+                    card.appendChild(select);
+
+                    const updateButton = document.createElement("button");
+                    updateButton.type = "button";
+                    updateButton.textContent = "✅ Update Status";
+
+                    updateButton.addEventListener("click", async function () {
+                        updateButton.disabled = true;
+                        updateButton.textContent = "Updating...";
+
+                        try {
+                            const updateResponse = await fetch(
+                                "/api/orders/" +
+                                encodeURIComponent(order.id) +
+                                "/status",
+                                {
+                                    method: "PATCH",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        status: select.value
+                                    })
+                                }
+                            );
+
+                            const result = await updateResponse.json();
+
+                            if (!updateResponse.ok || !result.success) {
+                                throw new Error(
+                                    result.message || "Status update failed."
+                                );
+                            }
+
+                            alert(
+                                "✅ Order status updated to: " +
+                                result.order.status
+                            );
+
+                            await showAdminOrders();
+
+                        } catch (error) {
+                            alert(
+                                "Could not update status. Check the server and try again."
+                            );
+
+                            updateButton.disabled = false;
+                            updateButton.textContent = "✅ Update Status";
+                        }
+                    });
+
+                    card.appendChild(updateButton);
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error("Order loading error:", error);
+                container.innerHTML =
+                    "<p>Could not load orders. Make sure the Node.js server is running.</p>";
+            }
+        }
+
+
+        // ========================================
+        // EXISTING FOOD AND CUSTOMER FEATURES
+        // ========================================
+
+        function refreshExistingFoods() {
+            if (typeof showAdminFoods === "function") {
+                showAdminFoods();
+            } else {
+                document.getElementById("adminFoodList").innerHTML =
+                    "<p>Your existing food-loading function is not available in script.js.</p>";
+            }
+        }
+
+        function refreshExistingCustomers() {
+            if (typeof showAdminUsers === "function") {
+                showAdminUsers();
+            } else {
+                document.getElementById("adminUsers").innerHTML =
+                    "<p>Your existing customer-loading function is not available in script.js.</p>";
+            }
+        }
+
+
+        // ========================================
+        // ADD FOOD USING EXISTING PROJECT FUNCTION
+        // ========================================
+
+        document.getElementById("adminFoodForm").addEventListener(
+            "submit",
+            function (event) {
+                event.preventDefault();
+
+                if (typeof addAdminFood !== "function") {
+                    document.getElementById("foodMessage").textContent =
+                        "Add-food function not found in script.js.";
+                    return;
+                }
+
+                addAdminFood();
+            }
+        );
+
+
+        // ========================================
+        // BUTTON EVENTS
+        // ========================================
+
+        document.getElementById("viewOrdersButton").addEventListener(
+            "click",
+            showAdminOrders
+        );
+
+        document.getElementById("viewCustomersButton").addEventListener(
+            "click",
+            refreshExistingCustomers
+        );
+
+        document.getElementById("refreshFoodsButton").addEventListener(
+            "click",
+            refreshExistingFoods
+        );
+
+
+        // ========================================
+        // INITIAL LOAD AND AUTOMATIC ORDER REFRESH
+        // ========================================
+
+        document.addEventListener("DOMContentLoaded", function () {
+            checkServer();
+            refreshExistingFoods();
+            refreshExistingCustomers();
+            showAdminOrders();
+        });
+
+        // Refresh order statuses shown in the admin dashboard.
+        setInterval(showAdminOrders, 15000);
+    </script>
+
+</body>
+</html>
+
